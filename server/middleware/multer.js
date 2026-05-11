@@ -1,16 +1,6 @@
+
 const multer = require('multer');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const cloudinary = require('../config/cloudinary');
-
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'medicare_profiles',
-    allowedFormats: ['jpg', 'png', 'jpeg', 'webp'],
-    transformation: [{ width: 500, height: 500, crop: 'limit' }]
-  }
-});
-
-const upload = multer({ storage: storage });
+const storage = multer.diskStorage({});
+const upload = multer({ storage });
 
 module.exports = upload;
