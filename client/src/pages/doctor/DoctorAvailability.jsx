@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, Check, Save } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import axiosInstance from '../../api/axios';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];

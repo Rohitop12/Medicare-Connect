@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Star, Send } from 'lucide-react';
 import axiosInstance from '../api/axios';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 const ReviewForm = () => {
   const [rating, setRating] = useState(0);

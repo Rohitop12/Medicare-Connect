@@ -17,13 +17,46 @@ const createAppointment = async (req, res) => {
     }
 
     const requestedDate = new Date(scheduledAt);
+    const requestedEndTime = new Date(requestedDate.getTime() + (req.body.duration || 30) * 60000);
+    
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const dayName = daysOfWeek[requestedDate.getDay()];
 
     const doctorAvailability = doctor.availability?.get(dayName);
     
+    // 1. Check if doctor is working on this day
     if (!doctorAvailability || !doctorAvailability.isWorking) {
-      return res.status(400).json({ message: `Doctor is unavailable on ${dayName}s.` });
+      return res.status(400).json({ message: "Doctor not available, please try a different date and time." });
+    }
+
+    // 2. Check if requested time is within working hours
+    const requestedTimeStr = requestedDate.toTimeString().slice(0, 5); // "HH:MM"
+    const requestedEndTimeStr = requestedEndTime.toTimeString().slice(0, 5);
+    
+    if (requestedTimeStr < doctorAvailability.start || requestedEndTimeStr > doctorAvailability.end) {
+      return res.status(400).json({ message: "Doctor not available, please try a different date and time." });
+    }
+
+    // 3. Check for overlapping appointments
+    const overlappingAppointment = await Appointment.findOne({
+      doctorId,
+      status: { $in: ['pending', 'confirmed'] },
+      $or: [
+        {
+          // Existing appointment starts before new one ends, and ends after new one starts
+          scheduledAt: { $lt: requestedEndTime },
+          $expr: {
+            $gt: [
+              { $add: ["$scheduledAt", { $multiply: ["$duration", 60000] }] },
+              requestedDate
+            ]
+          }
+        }
+      ]
+    });
+
+    if (overlappingAppointment) {
+      return res.status(400).json({ message: "Doctor not available, please try a different date and time." });
     }
 
     // TODO: We could also validate the start and end times here

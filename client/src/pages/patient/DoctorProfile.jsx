@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../api/axios';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { MapPin, Star, Calendar as CalendarIcon, Clock, ArrowLeft, Video, MessageSquare } from 'lucide-react';
 
 const DoctorProfile = () => {
